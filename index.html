@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./css/common/resert.css">
+    <style>
+        html, body {
+            -webkit-user-select: none !important; /*禁用手机浏览器的用户选择功能 */
+            -moz-user-select: none !important;
+        }
+        img {
+            -webkit-user-select: none; /*禁用手机浏览器的用户选择功能 */
+            -moz-user-select: none;
+        }
+        .img_body img {
+            -webkit-user-select: none; /*禁用手机浏览器的用户选择功能 */
+            -moz-user-select: none;
+        }
+
+        .img_body {
+            max-width: 450px;
+            margin: auto;
+        }
+
+        .img_box {
+            width: 100%;
+            height: auto;
+
+        }
+
+        .img_box img{
+            width: 100%;
+            height: auto;
+            display: block;
+            -webkit-user-select: none;/*禁用手机浏览器的用户选择功能 */
+            -moz-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .margin_bottom {
+            margin-bottom: -1px;
+        }
+
+    </style>
+    <script>
+        //移动端适配
+        (function () {
+            var html = document.documentElement;
+            function onWindowResize() {
+                html.style.fontSize = html.getBoundingClientRect().width / 60 + 'px';
+            }
+            window.addEventListener('resize', onWindowResize);
+            onWindowResize();
+            // debugger
+        })();
+    </script>
+    <script>
+    </script>
+    <script src="js/jquery.min.js" ></script>
+
+    <!-- 微信分享 start -->
+    <script src="http://res2.wx.qq.com/open/js/jweixin-1.6.0.js"></script>　
+    <script src="js/wxApiUtil.js"></script>
+    <!-- 微信分享 end -->
+
+    <!-- 钉钉分享 start -->
+    <script src="//g.alicdn.com/ilw/ding/0.6.2/scripts/dingtalk.js"></script>
+    <!-- 钉钉分享 end -->
+</head>
+<body>
+    <div class="img_body">
+        <div class="img_box margin_bottom" style="margin-top: -15px;">
+            <img src="./images/verticalHead.jpg" alt="">
+        </div>
+        <div class="img_box margin_bottom">
+            <img src="./images/verticalQs1.jpg" alt="">
+        </div>
+        <div class="img_box margin_bottom">
+            <img src="./images/verticalQs2.jpg" alt="">
+        </div>
+        <div class="img_box" id="weixin">
+            <img src="./images/verticalFooter.jpg" alt="">
+        </div>
+    </div>
+
+</body>
+<script>
+    //微信分享
+    var baseUrl='http://yq.zyzhedu.com/wx/system/wxRoute/';
+    var getdata = function (iter, p, _callback) {
+        var obj;
+        if (p) {
+            obj = {JSONPARAM: JSON.stringify(p)};
+        }
+        $.ajax({
+            type: iter.itype,
+            url: baseUrl + iter.iname + "?_n=" + Date.parse(new Date()) / 1000,
+            data: obj,
+            datatype: "JSON",
+            contentType: "application/x-www-form-urlencoded;charset=utf-8",
+            success: function (res) {
+                //后台返回的是json
+                //res = JSON.parse(res);
+                _callback(res);
+            },
+            error: function (e) {
+            }
+        });
+    };
+    if(wxApiUtil.checkWXEnvironment()){
+        //获取微信分享的相关参数
+        var ajaxobj = {
+            itype: "get",
+            iname: 'getJSSignature',
+        };
+        var actobj = {
+            wx_url: location.href.split('#')[0]
+        };
+        getdata(ajaxobj, actobj, function (data) {
+            wxApiUtil.config.timestamp = data.resultdata.timestamp;
+            wxApiUtil.config.nonceStr = data.resultdata.nonceStr;
+            wxApiUtil.config.signature = data.resultdata.signature;
+            wxApiUtil.config.share_url = 'http://yq.zyzhedu.com/yq/index.html';
+            wxApiUtil.initShareConfig(' 重磅 丨 教育系统疫情防控方案全集！！！',' 适用 丨 地方教育主管部门、中小学校（幼儿园），资料免费下载，线上免费咨询。','http://yq.zyzhedu.com/yq/images/logo2.png');
+        });
+    }
+
+
+</script>
+<script>
+    //钉钉分享
+     dd.ready(function () {
+        console.log('set title dd ready!')
+        console.log("dd:" + dd)
+        // 查看是否可以调用内置钉钉浏览器
+        if (dd) {
+            dd.biz.navigation.setTitle({
+            title: '重磅 丨 教育系统疫情防控方案全集！！！', // 控制标题文本，空字符串表示显示默认文本
+            onSuccess: function (result) {
+                /* 结构
+                {
+                } */
+            },
+            onFail: function (err) {
+                // alert('钉钉设置标题失败')
+            }
+            })
+
+            // 钉钉右上角更多事件控制
+            dd.biz.navigation.setRight({
+            show: true, // 控制按钮显示， true 显示， false 隐藏， 默认true
+            control: true, // 是否控制点击事件，true 控制，false 不控制， 默认false
+            text: '···', // 控制显示文本，空字符串表示显示默认文本
+            onSuccess: function (result) {
+                // alert("开始分享")
+                // 如果control为true，则onSuccess将在发生按钮点击事件被回调
+                // check share url ---------------------------------------------
+                // 钉钉内置分享
+                dd.biz.util.share({
+                type: 0, // 分享类型，0:全部组件 默认； 1:只能分享到钉钉；2:不能分享，只有刷新按钮
+                url: 'http://yq.zyzhedu.com/yq/index.html', // 打开链接
+                title: '重磅 丨 教育系统疫情防控方案全集！！！', //分享标题
+                content: '适用 丨 地方教育主管部门、中小学校（幼儿园），资料免费下载，线上免费咨询。', //分享简述
+                image: 'http://yq.zyzhedu.com/yq/images/logo2.png', // logo链接
+                onSuccess: function () {
+                    // onSuccess将在调起分享组件成功之后回调
+                    /**/
+                    // alert('分享成功')
+                },
+                onFail: function (err) {
+                    console.log("分享失败",err)
+                    // alert('分享失败')
+                }
+                })
+            },
+            onFail: function (err) {
+                // alert('点击右上角失败')
+                console.log("点击右上角失败",err)
+            }
+            })
+        }
+    });
+</script>
+</html>
